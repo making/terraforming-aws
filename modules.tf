@@ -1,3 +1,12 @@
+resource "random_integer" "bucket" {
+  min = 1
+  max = 100000
+}
+
+locals {
+  bucket_suffix = "${random_integer.bucket.result}"
+}
+
 module "ops_manager" {
   source = "./ops_manager"
 
@@ -17,7 +26,6 @@ module "ops_manager" {
   iam_ops_manager_user_name = "${aws_iam_user.ops_manager.name}"
   iam_ops_manager_role_name = "${aws_iam_role.ops_manager.name}"
   iam_ops_manager_role_arn  = "${aws_iam_role.ops_manager.arn}"
-  iam_pas_bucket_role_arn   = "${aws_iam_role.pas_bucket_access.arn}"
   bucket_suffix             = "${local.bucket_suffix}"
   instance_profile_name     = "${aws_iam_instance_profile.ops_manager.name}"
   instance_profile_arn      = "${aws_iam_instance_profile.ops_manager.arn}"

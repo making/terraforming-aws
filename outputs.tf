@@ -6,42 +6,6 @@ output "ops_manager_bucket" {
   value = "${module.ops_manager.bucket}"
 }
 
-output "pas_buildpacks_bucket" {
-  value = "${aws_s3_bucket.buildpacks_bucket.bucket}"
-}
-
-output "pas_droplets_bucket" {
-  value = "${aws_s3_bucket.droplets_bucket.bucket}"
-}
-
-output "pas_packages_bucket" {
-  value = "${aws_s3_bucket.packages_bucket.bucket}"
-}
-
-output "pas_resources_bucket" {
-  value = "${aws_s3_bucket.resources_bucket.bucket}"
-}
-
-output "pas_buildpacks_backup_bucket" {
-  value = "${element(concat(aws_s3_bucket.buildpacks_backup_bucket.*.bucket, list("")), 0)}"
-}
-
-output "pas_droplets_backup_bucket" {
-  value = "${element(concat(aws_s3_bucket.droplets_backup_bucket.*.bucket, list("")), 0)}"
-}
-
-output "pas_packages_backup_bucket" {
-  value = "${element(concat(aws_s3_bucket.packages_backup_bucket.*.bucket, list("")), 0)}"
-}
-
-output "pas_resources_backup_bucket" {
-  value = "${element(concat(aws_s3_bucket.resources_backup_bucket.*.bucket, list("")), 0)}"
-}
-
-output "blobstore_kms_key_id" {
-  value = "${aws_kms_key.blobstore_kms_key.key_id}"
-}
-
 output "ops_manager_public_ip" {
   value = "${module.ops_manager.public_ip}"
 }
@@ -58,16 +22,8 @@ output "env_dns_zone_name_servers" {
   value = ["${compact(split(",", local.name_servers))}"]
 }
 
-output "sys_domain" {
-  value = "sys.${var.env_name}.${var.dns_suffix}"
-}
-
-output "apps_domain" {
-  value = "apps.${var.env_name}.${var.dns_suffix}"
-}
-
-output "tcp_domain" {
-  value = "tcp.${var.env_name}.${var.dns_suffix}"
+output "pks_api_domain" {
+  value = "api.${var.env_name}.${var.dns_suffix}"
 }
 
 output "ops_manager_iam_instance_profile_name" {
@@ -84,27 +40,6 @@ output "ops_manager_iam_user_access_key" {
 
 output "ops_manager_iam_user_secret_key" {
   value = "${aws_iam_access_key.ops_manager.secret}"
-}
-
-output "pas_bucket_iam_instance_profile_name" {
-  value = "${aws_iam_instance_profile.pas_bucket_access.name}"
-}
-
-output "rds_address" {
-  value = "${element(concat(aws_db_instance.rds.*.address, list("")), 0)}"
-}
-
-output "rds_port" {
-  value = "${element(concat(aws_db_instance.rds.*.port, list("")), 0)}"
-}
-
-output "rds_username" {
-  value = "${element(concat(aws_db_instance.rds.*.username, list("")), 0)}"
-}
-
-output "rds_password" {
-  sensitive = true
-  value     = "${element(concat(aws_db_instance.rds.*.password, list("")), 0)}"
 }
 
 output "ops_manager_security_group_id" {
@@ -220,56 +155,16 @@ output "azs" {
   value = "${var.availability_zones}"
 }
 
-output "web_lb_name" {
-  value = "${aws_elb.web_elb.name}"
+output "pks_api_lb_name" {
+  value = "${aws_elb.pks_api_elb.name}"
 }
 
-output "web_elb_name" {
-  value = "${aws_elb.web_elb.name}"
+output "pks_api_elb_name" {
+  value = "${aws_elb.pks_api_elb.name}"
 }
 
-output "ssl_cert_arn" {
-  value = "${var.ssl_cert_arn}"
-}
-
-output "ssl_cert" {
-  sensitive = true
-  value     = "${length(var.ssl_ca_cert) > 0 ? element(concat(tls_locally_signed_cert.ssl_cert.*.cert_pem, list("")), 0) : var.ssl_cert}"
-}
-
-output "ssl_private_key" {
-  sensitive = true
-  value     = "${length(var.ssl_ca_cert) > 0 ? element(concat(tls_private_key.ssl_private_key.*.private_key_pem, list("")), 0) : var.ssl_private_key}"
-}
-
-output "ssh_lb_name" {
-  value = "${aws_elb.ssh_elb.name}"
-}
-
-output "ssh_elb_name" {
-  value = "${aws_elb.ssh_elb.name}"
-}
-
-output "tcp_lb_name" {
-  value = "${aws_elb.tcp_elb.name}"
-}
-
-output "tcp_elb_name" {
-  value = "${aws_elb.tcp_elb.name}"
-}
-
-output "isoseg_elb_name" {
-  value = "${element(concat(aws_elb.isoseg.*.name, list("")), 0)}"
-}
-
-output "isoseg_ssl_cert" {
-  sensitive = true
-  value     = "${length(var.isoseg_ssl_ca_cert) > 0 ? element(concat(tls_locally_signed_cert.isoseg_ssl_cert.*.cert_pem, list("")), 0) : var.isoseg_ssl_cert}"
-}
-
-output "isoseg_ssl_private_key" {
-  sensitive = true
-  value     = "${length(var.isoseg_ssl_ca_cert) > 0 ? element(concat(tls_private_key.isoseg_ssl_private_key.*.private_key_pem, list("")), 0) : var.isoseg_ssl_private_key}"
+output "pks_api_elb_dns_name" {
+  value = "${aws_elb.pks_api_elb.dns_name}"
 }
 
 output "dns_zone_id" {
@@ -278,6 +173,34 @@ output "dns_zone_id" {
 
 output "ops_manager_ip" {
   value = "${module.ops_manager.ops_manager_private_ip}"
+}
+
+output "ops_manager_private_ip" {
+  value = "${module.ops_manager.ops_manager_private_ip}"
+}
+
+output "pks_worker_iam_user_name" {
+  value = "${aws_iam_user.pks_worker.name}"
+}
+
+output "pks_worker_iam_user_access_key" {
+  value = "${aws_iam_access_key.pks_worker.id}"
+}
+
+output "pks_worker_iam_user_secret_key" {
+  value = "${aws_iam_access_key.pks_worker.secret}"
+}
+
+output "pks_master_iam_user_name" {
+  value = "${aws_iam_user.pks_master.name}"
+}
+
+output "pks_master_iam_user_access_key" {
+  value = "${aws_iam_access_key.pks_master.id}"
+}
+
+output "pks_master_iam_user_secret_key" {
+  value = "${aws_iam_access_key.pks_master.secret}"
 }
 
 output "ops_manager_private_ip" {

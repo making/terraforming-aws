@@ -24,8 +24,6 @@ variable "iam_ops_manager_role_name" {}
 
 variable "iam_ops_manager_role_arn" {}
 
-variable "iam_pas_bucket_role_arn" {}
-
 variable "instance_profile_name" {}
 
 variable "instance_profile_arn" {}

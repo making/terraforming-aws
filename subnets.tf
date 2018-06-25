@@ -3,7 +3,10 @@ locals {
   infrastructure_cidr = "${cidrsubnet(var.vpc_cidr, 10, 64)}"
   pas_cidr        = "${cidrsubnet(var.vpc_cidr, 6, 1)}"
   services_cidr   = "${cidrsubnet(var.vpc_cidr, 6, 2)}"
-  rds_cidr        = "${cidrsubnet(var.vpc_cidr, 6, 3)}"
+}
+
+resource "random_id" "kubernetes-cluster-tag" {
+  byte_length = 16
 }
 
 resource "aws_subnet" "public_subnets" {
@@ -13,7 +16,8 @@ resource "aws_subnet" "public_subnets" {
   availability_zone = "${element(var.availability_zones, count.index)}"
 
   tags = "${merge(var.tags, local.default_tags,
-    map("Name", "${var.env_name}-public-subnet${count.index}")
+    map("Name", "${var.env_name}-public-subnet${count.index}"),
+    map("KubernetesCluster", "${random_id.kubernetes-cluster-tag.b64}")
   )}"
 }
 
