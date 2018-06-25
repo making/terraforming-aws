@@ -1,0 +1,128 @@
+set -e
+
+source $(dirname "$0")/common.sh
+
+PRODUCT_NAME=pivotal-container-service
+
+om_generate_cert() (
+  set -eu
+  local domains="$1"
+  local data=$(echo $domains | jq --raw-input -c '{"domains": (. | split(" "))}')
+  local response=$(
+    om --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
+       --username "$OPS_MGR_USR" \
+       --password "$OPS_MGR_PWD" \
+       --skip-ssl-validation \
+       curl \
+       --silent \
+       --path "/api/v0/certificates/generate" \
+       -x POST \
+       -d $data
+    )
+    echo "$response"
+)
+
+PKS_API_IP=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_elb_dns_name.value')
+PKS_DOMAIN=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_elb_dns_name.value')
+PKS_MAIN_NETWORK_NAME=pks-main
+PKS_SERVICES_NETWORK_NAME=pks-services
+SINGLETON_AVAILABILITY_ZONE=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.azs.value[0]')
+AVAILABILITY_ZONES=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.azs.value | map({name: .})' | tr -d '\n' | tr -d '"')
+AVAILABILITY_ZONE_NAMES=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.azs.value' | tr -d '\n' | tr -d '"')
+CERTIFICATES=$(om_generate_cert "$PKS_DOMAIN")
+CERT_PEM=`echo $CERTIFICATES | jq -r '.certificate' | sed 's/^/        /'`
+KEY_PEM=`echo $CERTIFICATES | jq -r '.key' | sed 's/^/        /'`
+MASTER_ACCESS_KEY_ID=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.cfcr_master_iam_user_access_key.value')
+MASTER_SECRET_ACCESS_KEY=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.cfcr_master_iam_user_secret_key.value')
+WORKER_ACCESS_KEY_ID=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.cfcr_worker_iam_user_access_key.value')
+WORKER_SECRET_ACCESS_KEY=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.cfcr_worker_iam_user_secret_key.value')
+API_HOSTNAME=${PKS_DOMAIN}
+UAA_URL=${PKS_DOMAIN}
+LB_NAME=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_elb_name.value')
+
+cat <<EOF > /tmp/pks.yml
+---
+product-properties:
+  .pivotal-container-service.pks_tls:
+    value:
+      cert_pem: |
+$CERT_PEM
+      private_key_pem: |
+$KEY_PEM
+  .properties.pks_api_hostname:
+    value: $API_HOSTNAME
+  .properties.plan1_selector:
+    value: Plan Active
+  .properties.plan1_selector.active.master_az_placement:
+    value: $AVAILABILITY_ZONE_NAMES
+  .properties.plan1_selector.active.master_vm_type:
+    value: t2.micro
+  .properties.plan1_selector.active.worker_az_placement:
+    value: $AVAILABILITY_ZONE_NAMES
+  .properties.plan1_selector.active.worker_vm_type:
+    value: t2.medium
+  .properties.plan1_selector.active.worker_persistent_disk_type:
+    value: "51200"
+  .properties.plan1_selector.active.worker_instances:
+    value: 1
+  .properties.plan1_selector.active.errand_vm_type:
+    value: t2.small
+  .properties.plan2_selector:
+    value: Plan Active
+  .properties.plan2_selector.active.master_az_placement:
+    value: $AVAILABILITY_ZONE_NAMES
+  .properties.plan2_selector.active.master_vm_type:
+    value: t2.small
+  .properties.plan2_selector.active.worker_az_placement:
+    value: $AVAILABILITY_ZONE_NAMES
+  .properties.plan2_selector.active.worker_vm_type:
+    value: m4.large
+  .properties.plan2_selector.active.worker_persistent_disk_type:
+    value: "102400"
+  .properties.plan2_selector.active.worker_instances:
+    value: 3
+  .properties.plan2_selector.active.errand_vm_type:
+    value: t2.small
+  .properties.plan3_selector:
+    value: Plan Inactive
+  .properties.cloud_provider:
+    value: AWS
+  .properties.cloud_provider.aws.aws_access_key_id_master:
+    value: $MASTER_ACCESS_KEY_ID
+  .properties.cloud_provider.aws.aws_secret_access_key_master:
+    value:
+      secret: $MASTER_SECRET_ACCESS_KEY
+  .properties.cloud_provider.aws.aws_access_key_id_worker:
+    value: $WORKER_ACCESS_KEY_ID
+  .properties.cloud_provider.aws.aws_secret_access_key_worker:
+    value: 
+      secret: $WORKER_SECRET_ACCESS_KEY
+  .properties.telemetry_selector:
+    value: disabled        
+network-properties:
+  network:
+    name: $PKS_MAIN_NETWORK_NAME
+  service_network:
+    name: $PKS_SERVICES_NETWORK_NAME
+  other_availability_zones: $AVAILABILITY_ZONES
+  singleton_availability_zone:
+    name: $SINGLETON_AVAILABILITY_ZONE
+resource-config:
+  pivotal-container-service:
+    instance_type:
+      id: t2.micro
+    elb_names:
+    - $LB_NAME
+EOF
+cat /tmp/pks.yml
+
+om --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
+   --username "$OPS_MGR_USR" \
+   --password "$OPS_MGR_PWD" \
+   --skip-ssl-validation \
+   configure-product \
+   --product-name "${PRODUCT_NAME}" \
+   --config /tmp/pks.yml
+
+echo "PKS API: https://api-${PKS_DOMAIN}:9021"
+echo "UAA: https://api-${PKS_DOMAIN}:8443"
