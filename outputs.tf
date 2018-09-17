@@ -179,28 +179,12 @@ output "ops_manager_private_ip" {
   value = "${module.ops_manager.ops_manager_private_ip}"
 }
 
-output "pks_worker_iam_user_name" {
-  value = "${aws_iam_user.pks_worker.name}"
+output "pks_master_instance_profile_name" {
+  value = "${aws_iam_instance_profile.pks_master.name}"
 }
 
-output "pks_worker_iam_user_access_key" {
-  value = "${aws_iam_access_key.pks_worker.id}"
-}
-
-output "pks_worker_iam_user_secret_key" {
-  value = "${aws_iam_access_key.pks_worker.secret}"
-}
-
-output "pks_master_iam_user_name" {
-  value = "${aws_iam_user.pks_master.name}"
-}
-
-output "pks_master_iam_user_access_key" {
-  value = "${aws_iam_access_key.pks_master.id}"
-}
-
-output "pks_master_iam_user_secret_key" {
-  value = "${aws_iam_access_key.pks_master.secret}"
+output "pks_worker_instance_profile_name" {
+  value = "${aws_iam_instance_profile.pks_worker.name}"
 }
 
 /*****************************

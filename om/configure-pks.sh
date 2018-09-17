@@ -32,10 +32,8 @@ AVAILABILITY_ZONE_NAMES=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].out
 CERTIFICATES=$(om_generate_cert "$PKS_DOMAIN")
 CERT_PEM=`echo $CERTIFICATES | jq -r '.certificate' | sed 's/^/        /'`
 KEY_PEM=`echo $CERTIFICATES | jq -r '.key' | sed 's/^/        /'`
-MASTER_ACCESS_KEY_ID=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.cfcr_master_iam_user_access_key.value')
-MASTER_SECRET_ACCESS_KEY=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.cfcr_master_iam_user_secret_key.value')
-WORKER_ACCESS_KEY_ID=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.cfcr_worker_iam_user_access_key.value')
-WORKER_SECRET_ACCESS_KEY=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.cfcr_worker_iam_user_secret_key.value')
+INSTANCE_PROFILE_MASTER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_master_instance_profile_name.value')
+INSTANCE_PROFILE_WORKER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_worker_instance_profile_name.value')
 API_HOSTNAME=${PKS_DOMAIN}
 UAA_URL=${PKS_DOMAIN}
 LB_NAME=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_elb_name.value')
@@ -87,18 +85,12 @@ $KEY_PEM
     value: Plan Inactive
   .properties.cloud_provider:
     value: AWS
-  .properties.cloud_provider.aws.aws_access_key_id_master:
-    value: $MASTER_ACCESS_KEY_ID
-  .properties.cloud_provider.aws.aws_secret_access_key_master:
-    value:
-      secret: $MASTER_SECRET_ACCESS_KEY
-  .properties.cloud_provider.aws.aws_access_key_id_worker:
-    value: $WORKER_ACCESS_KEY_ID
-  .properties.cloud_provider.aws.aws_secret_access_key_worker:
-    value: 
-      secret: $WORKER_SECRET_ACCESS_KEY
+  .properties.cloud_provider.aws.iam_instance_profile_master:
+    value: $INSTANCE_PROFILE_MASTER
+  .properties.cloud_provider.aws.iam_instance_profile_worker:
+    value: $INSTANCE_PROFILE_WORKER
   .properties.telemetry_selector:
-    value: disabled        
+    value: enabled        
 network-properties:
   network:
     name: $PKS_MAIN_NETWORK_NAME

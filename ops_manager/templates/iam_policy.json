@@ -127,6 +127,16 @@
       "Resource": [
         "*"
       ]
+    },
+    {
+      "Sid": "VisualEditor0",
+      "Effect": "Allow",
+      "Action": [
+        "iam:PassRole"
+      ],
+      "Resource": [
+        "*"
+      ]
     }
   ]
 }
