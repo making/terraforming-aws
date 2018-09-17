@@ -203,10 +203,6 @@ output "pks_master_iam_user_secret_key" {
   value = "${aws_iam_access_key.pks_master.secret}"
 }
 
-output "ops_manager_private_ip" {
-  value = "${module.ops_manager.ops_manager_private_ip}"
-}
-
 /*****************************
  * Deprecated *
  *****************************/
