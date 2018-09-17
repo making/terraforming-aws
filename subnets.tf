@@ -5,10 +5,6 @@ locals {
   services_cidr   = "${cidrsubnet(var.vpc_cidr, 6, 2)}"
 }
 
-resource "random_id" "kubernetes-cluster-tag" {
-  byte_length = 16
-}
-
 resource "aws_subnet" "public_subnets" {
   count             = "${length(var.availability_zones)}"
   vpc_id            = "${aws_vpc.vpc.id}"
@@ -16,8 +12,7 @@ resource "aws_subnet" "public_subnets" {
   availability_zone = "${element(var.availability_zones, count.index)}"
 
   tags = "${merge(var.tags, local.default_tags,
-    map("Name", "${var.env_name}-public-subnet${count.index}"),
-    map("KubernetesCluster", "${random_id.kubernetes-cluster-tag.b64}")
+    map("Name", "${var.env_name}-public-subnet${count.index}")
   )}"
 }
 
@@ -82,26 +77,4 @@ data "template_file" "services_subnet_gateways" {
   vars {
     gateway = "${cidrhost(element(aws_subnet.services_subnets.*.cidr_block, count.index), 1)}"
   }
-}
-
-resource "aws_subnet" "rds_subnets" {
-  count             = "${length(var.availability_zones)}"
-  vpc_id            = "${aws_vpc.vpc.id}"
-  cidr_block        = "${cidrsubnet(local.rds_cidr, 2, count.index)}"
-  availability_zone = "${element(var.availability_zones, count.index)}"
-
-  tags = "${merge(var.tags, local.default_tags,
-    map("Name", "${var.env_name}-rds-subnet${count.index}")
-  )}"
-}
-
-resource "aws_db_subnet_group" "rds_subnet_group" {
-  name        = "${var.env_name}_db_subnet_group"
-  description = "RDS Subnet Group"
-
-  subnet_ids = ["${aws_subnet.rds_subnets.*.id}"]
-
-  tags = "${merge(var.tags, local.default_tags,
-    map("Name", "${var.env_name}-db-subnet-group")
-  )}"
 }
