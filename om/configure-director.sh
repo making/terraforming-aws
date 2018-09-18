@@ -4,7 +4,6 @@ set -e
 
 source $(dirname "$0")/common.sh
 
-OPSMAN_DOMAIN_OR_IP_ADDRESS=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.ops_manager_public_ip.value')
 # IaaS
 ACCESS_KEY_ID=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.ops_manager_iam_user_access_key.value')
 SECRET_ACCESS_KEY=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.ops_manager_iam_user_secret_key.value')
