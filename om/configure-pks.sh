@@ -92,7 +92,7 @@ $KEY_PEM
   .properties.telemetry_selector:
     value: enabled
   .properties.uaa_oidc:
-    value: enabled
+    value: true
 network-properties:
   network:
     name: $PKS_MAIN_NETWORK_NAME
