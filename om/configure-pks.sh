@@ -90,7 +90,9 @@ $KEY_PEM
   .properties.cloud_provider.aws.iam_instance_profile_worker:
     value: $INSTANCE_PROFILE_WORKER
   .properties.telemetry_selector:
-    value: enabled        
+    value: enabled
+  .properties.uaa_oidc:
+    value: enabled
 network-properties:
   network:
     name: $PKS_MAIN_NETWORK_NAME
