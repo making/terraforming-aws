@@ -23,7 +23,7 @@ om_generate_cert() (
 )
 
 PKS_API_IP=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_elb_dns_name.value')
-PKS_DOMAIN=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_elb_dns_name.value')
+PKS_DOMAIN=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_domain.value')
 PKS_MAIN_NETWORK_NAME=pks-main
 PKS_SERVICES_NETWORK_NAME=pks-services
 SINGLETON_AVAILABILITY_ZONE=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.azs.value[0]')
@@ -116,5 +116,5 @@ om --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
    --product-name "${PRODUCT_NAME}" \
    --config /tmp/pks.yml
 
-echo "PKS API: https://api-${PKS_DOMAIN}:9021"
-echo "UAA: https://api-${PKS_DOMAIN}:8443"
+echo "PKS API: https://${PKS_DOMAIN}:9021"
+echo "UAA: https://${PKS_DOMAIN}:8443"
