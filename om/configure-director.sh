@@ -74,6 +74,7 @@ SERVICES_GATEWAY_2=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.
 SERVICES_AVAILABILITY_ZONES_2=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.services_subnet_availability_zones.value[2]')
 SINGLETON_AVAILABILITY_NETWORK=$INFRASTRUCTURE_NETWORK_NAME
 SINGLETON_AVAILABILITY_ZONE=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.azs.value[0]')
+OPS_MGR_TRUSTED_CERTS=$(echo $OPS_MGR_TRUSTED_CERTS | sed 's/^/        /')
 
 cat <<EOF > /tmp/director.yml
 ---
@@ -180,7 +181,8 @@ network-assignment:
   singleton_availability_zone:
     name: $SINGLETON_AVAILABILITY_ZONE
 security-configuration:
-  trusted_certificates: "$OPS_MGR_TRUSTED_CERTS"
+  trusted_certificates:  |
+$OPS_MGR_TRUSTED_CERTS
   vm_password_type: generate
 resource-configuration:
   director:
