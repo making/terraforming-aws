@@ -54,7 +54,7 @@ $KEY_PEM
   .properties.plan1_selector.active.master_az_placement:
     value: $AVAILABILITY_ZONE_NAMES
   .properties.plan1_selector.active.master_vm_type:
-    value: t2.micro
+    value: t2.small
   .properties.plan1_selector.active.worker_az_placement:
     value: $AVAILABILITY_ZONE_NAMES
   .properties.plan1_selector.active.worker_vm_type:
@@ -65,6 +65,24 @@ $KEY_PEM
     value: 1
   .properties.plan1_selector.active.errand_vm_type:
     value: t2.small
+  .properties.plan1_selector.active.addons_spec:
+    value: |
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: standard
+        annotations:
+          storageclass.beta.kubernetes.io/is-default-class: "true"
+        labels:
+          kubernetes.io/cluster-service: "true"
+          addonmanager.kubernetes.io/mode: EnsureExists
+      provisioner: kubernetes.io/aws-ebs
+      allowVolumeExpansion: true
+      parameters:
+        type: gp2
+      ---
+  .properties.plan1_selector.active.allow_privileged_containers:
+    value: 1
   .properties.plan2_selector:
     value: Plan Active
   .properties.plan2_selector.active.master_az_placement:
@@ -81,6 +99,24 @@ $KEY_PEM
     value: 3
   .properties.plan2_selector.active.errand_vm_type:
     value: t2.small
+  .properties.plan2_selector.active.addons_spec:
+    value: |
+      apiVersion: storage.k8s.io/v1
+      kind: StorageClass
+      metadata:
+        name: standard
+        annotations:
+          storageclass.beta.kubernetes.io/is-default-class: "true"
+        labels:
+          kubernetes.io/cluster-service: "true"
+          addonmanager.kubernetes.io/mode: EnsureExists
+      provisioner: kubernetes.io/aws-ebs
+      allowVolumeExpansion: true
+      parameters:
+        type: gp2
+      ---
+  .properties.plan2_selector.active.allow_privileged_containers:
+    value: 1
   .properties.plan3_selector:
     value: Plan Inactive
   .properties.cloud_provider:
@@ -104,7 +140,7 @@ network-properties:
 resource-config:
   pivotal-container-service:
     instance_type:
-      id: t2.micro
+      id: c4.large
     elb_names:
     - $LB_NAME
 EOF
