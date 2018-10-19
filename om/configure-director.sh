@@ -181,7 +181,7 @@ network-assignment:
   singleton_availability_zone:
     name: $SINGLETON_AVAILABILITY_ZONE
 security-configuration:
-  trusted_certificates:  |
+  trusted_certificates: |
 $OPS_MGR_TRUSTED_CERTS
   vm_password_type: generate
 resource-configuration:
