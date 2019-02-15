@@ -22,8 +22,14 @@ if [ "${CERT_PEM}" == "" ];then
   CERT_PEM=`echo $CERTIFICATES | jq -r '.certificate'`
   KEY_PEM=`echo $CERTIFICATES | jq -r '.key'`
 fi
-CERT_PEM=`echo ${CERT_PEM} | sed 's/^/        /'`
-KEY_PEM=`echo ${KEY_PEM} | sed 's/^/        /'`
+CERT_PEM=`cat <<EOF | sed 's/^/        /'
+${CERT_PEM}
+EOF
+`
+KEY_PEM=`echo <<EOF | sed 's/^/        /'
+${KEY_PEM}
+EOF
+`
 INSTANCE_PROFILE_MASTER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_master_iam_instance_profile_name.value')
 INSTANCE_PROFILE_WORKER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_worker_iam_instance_profile_name.value')
 API_HOSTNAME=${PKS_DOMAIN}
