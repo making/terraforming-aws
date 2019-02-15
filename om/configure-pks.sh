@@ -26,7 +26,7 @@ CERT_PEM=`cat <<EOF | sed 's/^/        /'
 ${CERT_PEM}
 EOF
 `
-KEY_PEM=`echo <<EOF | sed 's/^/        /'
+KEY_PEM=`cat <<EOF | sed 's/^/        /'
 ${KEY_PEM}
 EOF
 `
