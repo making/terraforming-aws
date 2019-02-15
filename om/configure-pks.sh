@@ -2,10 +2,6 @@ set -e
 
 source $(dirname "$0")/common.sh
 
-OM_TARGET=${OPSMAN_DOMAIN_OR_IP_ADDRESS}
-OM_USERNAME=${OPS_MGR_USR}
-OM_PASSWORD=${OPS_MGR_PWD}
-
 PRODUCT_NAME=pivotal-container-service
 
 PKS_API_IP=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_elb_dns_name.value')
@@ -134,7 +130,10 @@ resource-config:
 EOF
 cat /tmp/pks.yml
 
-om --skip-ssl-validation \
+om --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
+   --username "$OPS_MGR_USR" \
+   --password "$OPS_MGR_PWD" \
+   --skip-ssl-validation \
    configure-product \
    --product-name "${PRODUCT_NAME}" \
    --config /tmp/pks.yml
