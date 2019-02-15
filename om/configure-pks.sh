@@ -5,7 +5,7 @@ source $(dirname "$0")/common.sh
 PRODUCT_NAME=pivotal-container-service
 
 PKS_API_IP=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_elb_dns_name.value')
-PKS_DOMAIN=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_domain.value')
+PKS_DOMAIN=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_endpoint.value')
 PKS_MAIN_NETWORK_NAME=pks-main
 PKS_SERVICES_NETWORK_NAME=pks-services
 SINGLETON_AVAILABILITY_ZONE=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.azs.value[0]')
@@ -24,7 +24,7 @@ INSTANCE_PROFILE_MASTER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].out
 INSTANCE_PROFILE_WORKER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_worker_iam_instance_profile_name.value')
 API_HOSTNAME=${PKS_DOMAIN}
 UAA_URL=${PKS_DOMAIN}
-LB_NAME=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_elb_name.value')
+LB_NAME=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[4].resources["aws_lb.pks_api"].primary.attributes.name')
 
 cat <<EOF > /tmp/pks.yml
 ---
