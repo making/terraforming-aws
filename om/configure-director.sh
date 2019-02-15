@@ -184,6 +184,7 @@ security-configuration:
   trusted_certificates: |
 $OPS_MGR_TRUSTED_CERTS
   vm_password_type: generate
+  include_opsmanager_root_ca_in_trusted_certificates: true
 resource-configuration:
   director:
     instance_type:
