@@ -19,9 +19,11 @@ if [ "${CERT_PEM}" == "" ];then
      --password "$OPS_MGR_PWD" \
      --skip-ssl-validation\
      generate-certificate -d ${WILDCARD_DOMAIN}`
-  CERT_PEM=`echo $CERTIFICATES | jq -r '.certificate' | sed 's/^/        /'`
-  KEY_PEM=`echo $CERTIFICATES | jq -r '.key' | sed 's/^/        /'`
+  CERT_PEM=`echo $CERTIFICATES | jq -r '.certificate'`
+  KEY_PEM=`echo $CERTIFICATES | jq -r '.key'`
 fi
+CERT_PEM=`echo ${CERT_PEM} | sed 's/^/        /'`
+KEY_PEM=`echo ${KEY_PEM} | sed 's/^/        /'`
 INSTANCE_PROFILE_MASTER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_master_iam_instance_profile_name.value')
 INSTANCE_PROFILE_WORKER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_worker_iam_instance_profile_name.value')
 API_HOSTNAME=${PKS_DOMAIN}
