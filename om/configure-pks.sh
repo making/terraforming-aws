@@ -20,8 +20,8 @@ CERTIFICATES=`om --target "https://${OPSMAN_DOMAIN_OR_IP_ADDRESS}" \
    generate-certificate -d ${WILDCARD_DOMAIN}`
 CERT_PEM=`echo $CERTIFICATES | jq -r '.certificate' | sed 's/^/        /'`
 KEY_PEM=`echo $CERTIFICATES | jq -r '.key' | sed 's/^/        /'`
-INSTANCE_PROFILE_MASTER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_master_instance_profile_name.value')
-INSTANCE_PROFILE_WORKER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_worker_instance_profile_name.value')
+INSTANCE_PROFILE_MASTER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_master_iam_instance_profile_name.value')
+INSTANCE_PROFILE_WORKER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_worker_iam_instance_profile_name.value')
 API_HOSTNAME=${PKS_DOMAIN}
 UAA_URL=${PKS_DOMAIN}
 LB_NAME=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_elb_name.value')
