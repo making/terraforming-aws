@@ -12,8 +12,8 @@ SINGLETON_AVAILABILITY_ZONE=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0]
 AVAILABILITY_ZONES=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.azs.value | map({name: .})' | tr -d '\n' | tr -d '"')
 AVAILABILITY_ZONE_NAMES=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.azs.value' | tr -d '\n' | tr -d '"')
 
-WILDCARD_DOMAIN=`echo ${WILDCARD_DOMAIN} | sed 's/pcf/*/g'`
-CERTIFICATES=`om generate-certificate --domains ${WILDCARD_DOMAIN}`
+WILDCARD_DOMAIN=`echo ${OPSMAN_DOMAIN_OR_IP_ADDRESS} | sed 's/pcf/*/g'`
+CERTIFICATES=`om generate-certificate -ds ${WILDCARD_DOMAIN}`
 CERT_PEM=`echo $CERTIFICATES | jq -r '.certificate' | sed 's/^/        /'`
 KEY_PEM=`echo $CERTIFICATES | jq -r '.key' | sed 's/^/        /'`
 INSTANCE_PROFILE_MASTER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_master_instance_profile_name.value')
