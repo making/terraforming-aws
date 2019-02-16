@@ -53,4 +53,6 @@ uaac member add pks.clusters.admin \${PKS_USER}
 ### Log in to PKS
 pks login -k -a \${PKS_API_URL} -u \${PKS_USER} -p \${PKS_PASSWORD}
 
+See also https://github.com/making/pks-pipeline-aws/terraform
+
 EOF
