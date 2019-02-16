@@ -139,7 +139,8 @@ resource-config:
     instance_type:
       id: c4.large
     additional_vm_extensions:
-    - pks-api-nlb
+    - pks-api-lb
+    - pks-api-lb-security-groups
 EOF
 cat /tmp/pks.yml
 
