@@ -34,7 +34,6 @@ INSTANCE_PROFILE_MASTER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].out
 INSTANCE_PROFILE_WORKER=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_worker_iam_instance_profile_name.value')
 API_HOSTNAME=${PKS_DOMAIN}
 UAA_URL=${PKS_DOMAIN}
-LB_NAME=alb:$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[4].resources["aws_lb_target_group.pks_api_8443"].primary.attributes.name'),alb:$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[4].resources["aws_lb_target_group.pks_api_9021"].primary.attributes.name')
 
 cat <<EOF > /tmp/pks.yml
 ---
@@ -139,8 +138,8 @@ resource-config:
   pivotal-container-service:
     instance_type:
       id: c4.large
-    elb_names:
-    - $LB_NAME
+    additional_vm_extensions:
+    - pks-api-nlb
 EOF
 cat /tmp/pks.yml
 
