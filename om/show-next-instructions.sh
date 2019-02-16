@@ -29,7 +29,7 @@ ADMIN_SECRET=$(om \
     | jq -r '.credential.value.secret'
 )
 
-PKS_DOMAIN=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_domain.value')
+PKS_DOMAIN=$(cat $TF_DIR/terraform.tfstate | jq -r '.modules[0].outputs.pks_api_endpoint.value')
 
 PKS_API_URL=https://${PKS_DOMAIN}:9021
 UAA_URL=https://${PKS_DOMAIN}:8443
